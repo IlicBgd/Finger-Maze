@@ -23,9 +23,20 @@ public class CellsGenerator : MonoBehaviour
     float scaleX;
     float scaleY;
 
-    List<Cell> cellList = new List<Cell>();
+    Cell[,] cells;
+    List<Edge> horEdges = new List<Edge>();
+    List<Edge> verEdges = new List<Edge>();
     private void Awake()
     {
+        cells = new Cell[sizeHorizontal,sizeVertical];
+        for (int x = 0; x < sizeHorizontal; x++)
+        {
+            for (int y = 0; y < sizeVertical; y++)
+            {
+                cells[x, y] = new Cell();
+            }
+        }
+
         scaleX = cellAreaSize.x / sizeHorizontal;
         scaleY = cellAreaSize.y / sizeVertical;
 
@@ -40,20 +51,36 @@ public class CellsGenerator : MonoBehaviour
         startPosition.x = transform.position.x - (cellScale.x / 2) * (sizeHorizontal - 1);
         startPosition.y = transform.position.y + (cellScale.y / 2) * (sizeVertical - 1);
 
-        int counter = 0;
+        //int counter = 0;
+        float offsetHoriz = horizontalEdge.spriteRenderer.bounds.size.x * cellScale.x / 2;
+        float offsetVert = verticalEdge.spriteRenderer.bounds.size.y * cellScale.y / 2;
+
+        transform.localScale = cellScale;
+
+        /////////////////////////////////
+        //GENERATE EDGES BASED ON CELLS//
+        /////////////////////////////////
+
         for (int i = 0; i < sizeHorizontal; i++)
         {
-            Edge horEdge;
-            Vector2 horPosition = startPosition + new Vector2(cellScale.x * i, -cellScale.y * i);
-
             for (int j = 0; j < sizeVertical; j++)
             {
-                Cell cell;
-                Vector2 newPosition = startPosition + new Vector2(cellScale.x * i, -cellScale.y * j);
-                cell = Instantiate(cellPrefab, newPosition, Quaternion.identity, transform);
-                cell.transform.localScale = cellScale;
-                cell.name = string.Format("Cell number: {0}", counter++);
-                cellList.Add(cell);
+                Edge horEdge;
+                Edge verEdge;
+                Vector2 position = startPosition + new Vector2(cellScale.x * i, -cellScale.y * j + offsetVert);
+                horEdge = Instantiate(horizontalEdge, position, Quaternion.identity, transform);
+                position = startPosition + new Vector2(cellScale.x * i - offsetHoriz, -cellScale.y * j);
+                verEdge = Instantiate(verticalEdge, position, Quaternion.identity, transform);
+                if (i == sizeHorizontal - 1)
+                {
+                    position = startPosition + new Vector2(cellScale.x * i + offsetHoriz, -cellScale.y * j);
+                    verEdge = Instantiate(verticalEdge, position, Quaternion.identity, transform);
+                }
+                if (j == sizeVertical - 1)
+                {
+                    position = startPosition + new Vector2(cellScale.x * i, -cellScale.y * j - offsetVert);
+                    horEdge = Instantiate(horizontalEdge, position, Quaternion.identity, transform);
+                }
             }
         }
     }
