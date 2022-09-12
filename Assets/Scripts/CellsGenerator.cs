@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
@@ -48,7 +49,7 @@ public class CellsGenerator : MonoBehaviour
     }
     private void Start()
     {
-        //MazeAlgorithm();
+        MazeAlgorithm();
     }
     //Cell => only info
     //Use parent => scale, offset, position
@@ -92,24 +93,39 @@ public class CellsGenerator : MonoBehaviour
             }
         }
     }
+    int GetUniqueIDCount()
+    {
+        List<Cell> tempCells = new List<Cell>();
+        for (int i = 0; i < sizeHorizontal; i++)
+        {
+            for (int j = 0; j < sizeVertical; j++)
+            {
+                if (tempCells.FirstOrDefault(c => cells[i,j].cellID == c.cellID) == null)
+                {
+                    tempCells.Add(cells[i, j]);
+                }
+            }
+        }
+        return tempCells.Count;
+    }
     void MazeAlgorithm()
     {
-        if (cellCounter > 1)
+        if (GetUniqueIDCount() > 1)
         {
             MazeHelper(cells[Random.Range(0, sizeHorizontal), Random.Range(0, sizeVertical)]);
-            //MazeAlgorithm();
+            MazeAlgorithm();
         }
     }
     void MazeHelper(Cell cell)
     {
-        //Add edge check if null
-        int randomSide = Random.Range(0, 4);
+        //Add trees
+        int randomSide = cell.GetRandomEdge();
 
         if (randomSide == 0)
         {
             if (cell.cellID % sizeVertical != 0)
             {
-                Destroy(cell.north);
+                Destroy(cell.north.gameObject);
             }
             else
             {
@@ -120,7 +136,7 @@ public class CellsGenerator : MonoBehaviour
         {
             if ((cell.cellID + 1) % sizeVertical != 0)
             {
-                Destroy(cell.south);
+                Destroy(cell.south.gameObject);
             }
             else
             {
@@ -129,9 +145,9 @@ public class CellsGenerator : MonoBehaviour
         }
         else if (randomSide == 2)
         {
-            if (cell.cellID > sizeVertical)
+            if (cell.cellID >= sizeVertical)
             {
-                Destroy(cell.west);
+                Destroy(cell.west.gameObject);
             }
             else
             {
@@ -142,12 +158,16 @@ public class CellsGenerator : MonoBehaviour
         {
             if (cell.cellID < sizeHorizontal * sizeVertical - sizeVertical)
             {
-                Destroy(cell.east);
+                Destroy(cell.east.gameObject);
             }
             else
             {
                 return;
             }
         }
+    }
+    void TreeUnifier()
+    {
+
     }
 }
