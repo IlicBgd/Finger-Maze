@@ -25,9 +25,6 @@ public class CellsGenerator : MonoBehaviour
 
     Cell[,] cells;
 
-    List<Edge> horEdges = new List<Edge>();
-    List<Edge> verEdges = new List<Edge>();
-
     int cellCounter = 0;
     private void Awake()
     {
@@ -48,11 +45,10 @@ public class CellsGenerator : MonoBehaviour
         cellScale = scaleX < scaleY ? new Vector2(scaleX, scaleX) : new Vector2(scaleY, scaleY);
 
         GenerateCells();
-        AddEdgesToCells();
     }
     private void Start()
     {
-        MazeAlgorithm();
+        //MazeAlgorithm();
     }
     //Cell => only info
     //Use parent => scale, offset, position
@@ -71,60 +67,30 @@ public class CellsGenerator : MonoBehaviour
         {
             for (int j = 0; j < sizeVertical; j++)
             {
-                Edge horEdge;
-                Edge verEdge;
                 Vector2 position = startPosition + new Vector2(cellScale.x * i, -cellScale.y * j + offsetVert);
-                horEdge = Instantiate(horizontalEdge, position, Quaternion.identity, transform);
-                horEdges.Add(horEdge);
+                cells[i, j].north = Instantiate(horizontalEdge, position, Quaternion.identity, transform);
                 position = startPosition + new Vector2(cellScale.x * i - offsetHoriz, -cellScale.y * j);
-                verEdge = Instantiate(verticalEdge, position, Quaternion.identity, transform);
-                verEdges.Add(verEdge);
+                cells[i, j].west = Instantiate(verticalEdge, position, Quaternion.identity, transform);
                 if (i == sizeHorizontal - 1)
                 {
                     position = startPosition + new Vector2(cellScale.x * i + offsetHoriz, -cellScale.y * j);
-                    verEdge = Instantiate(verticalEdge, position, Quaternion.identity, transform);
-                    verEdges.Add(verEdge);
+                    cells[i, j].east = Instantiate(verticalEdge, position, Quaternion.identity, transform);
+                }
+                if (i != 0)
+                {
+                    cells[i - 1, j].east = cells[i, j].west;
                 }
                 if (j == sizeVertical - 1)
                 {
                     position = startPosition + new Vector2(cellScale.x * i, -cellScale.y * j - offsetVert);
-                    horEdge = Instantiate(horizontalEdge, position, Quaternion.identity, transform);
-                    horEdges.Add(horEdge);
+                    cells[i, j].south = Instantiate(horizontalEdge, position, Quaternion.identity, transform);
+                }
+                if (j != 0)
+                {
+                    cells[i, j - 1].south = cells[i, j].north;
                 }
             }
         }
-    }
-    void AddEdgesToCells()
-    {
-        int counter = 0;
-
-        for (int x = 0; x < sizeHorizontal; x++)
-        {
-            for (int y = 0; y < sizeVertical; y++)
-            {
-                NorthEdge(cells[x, y], x + y + counter);
-                SouthEdge(cells[x, y], x + y + counter + 1);
-                WestEdge(cells[x, y], x + y);
-                EastEdge(cells[x, y], x + y + sizeVertical);
-                counter++;
-            }
-        }
-    }
-    void NorthEdge(Cell cell, int number)
-    {
-        cell.north = horEdges[number];
-    }
-    void SouthEdge(Cell cell, int number)
-    {
-        cell.south = horEdges[number];
-    }
-    void WestEdge(Cell cell, int number)
-    {
-        cell.west = verEdges[number];
-    }
-    void EastEdge(Cell cell, int number)
-    {
-        cell.east = verEdges[number];
     }
     void MazeAlgorithm()
     {
@@ -136,6 +102,7 @@ public class CellsGenerator : MonoBehaviour
     }
     void MazeHelper(Cell cell)
     {
+        //Add edge check if null
         int randomSide = Random.Range(0, 4);
 
         if (randomSide == 0)
