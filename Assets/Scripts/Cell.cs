@@ -8,4 +8,6 @@ public class Cell
     public Edge south;
     public Edge west;
     public Edge east;
+
+    public int cellID;
 }

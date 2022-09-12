@@ -23,10 +23,12 @@ public class CellsGenerator : MonoBehaviour
     float scaleX;
     float scaleY;
 
-    //Private this after, testing only
-    public Cell[,] cells;
+    Cell[,] cells;
+
     List<Edge> horEdges = new List<Edge>();
     List<Edge> verEdges = new List<Edge>();
+
+    int cellCounter = 0;
     private void Awake()
     {
         cells = new Cell[sizeHorizontal, sizeVertical];
@@ -35,6 +37,8 @@ public class CellsGenerator : MonoBehaviour
             for (int y = 0; y < sizeVertical; y++)
             {
                 cells[x, y] = new Cell();
+                cells[x, y].cellID = cellCounter;
+                cellCounter++;
             }
         }
 
@@ -45,6 +49,10 @@ public class CellsGenerator : MonoBehaviour
 
         GenerateCells();
         AddEdgesToCells();
+    }
+    private void Start()
+    {
+        MazeAlgorithm();
     }
     //Cell => only info
     //Use parent => scale, offset, position
@@ -120,6 +128,59 @@ public class CellsGenerator : MonoBehaviour
     }
     void MazeAlgorithm()
     {
+        if (cellCounter > 1)
+        {
+            MazeHelper(cells[Random.Range(0, sizeHorizontal), Random.Range(0, sizeVertical)]);
+            //MazeAlgorithm();
+        }
+    }
+    void MazeHelper(Cell cell)
+    {
+        int randomSide = Random.Range(0, 4);
 
+        if (randomSide == 0)
+        {
+            if (cell.cellID % sizeVertical != 0)
+            {
+                Destroy(cell.north);
+            }
+            else
+            {
+                return;
+            }
+        }
+        else if (randomSide == 1)
+        {
+            if ((cell.cellID + 1) % sizeVertical != 0)
+            {
+                Destroy(cell.south);
+            }
+            else
+            {
+                return;
+            }
+        }
+        else if (randomSide == 2)
+        {
+            if (cell.cellID > sizeVertical)
+            {
+                Destroy(cell.west);
+            }
+            else
+            {
+                return;
+            }
+        }
+        else if (randomSide == 3)
+        {
+            if (cell.cellID < sizeHorizontal * sizeVertical - sizeVertical)
+            {
+                Destroy(cell.east);
+            }
+            else
+            {
+                return;
+            }
+        }
     }
 }
