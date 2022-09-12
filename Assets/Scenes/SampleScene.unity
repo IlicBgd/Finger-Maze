@@ -154,7 +154,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sizeHorizontal: 4
   sizeVertical: 3
-  cellPrefab: {fileID: 5516856600856957437, guid: 4a273409734224b4c9ca39418c9aa763, type: 3}
   horizontalEdge: {fileID: 6106699195583475610, guid: 172f0149f4075eb458cffa4762b5129f, type: 3}
   verticalEdge: {fileID: 354701558229283866, guid: f9bed3dbbdff35d409e7199ea5427db4, type: 3}
   cellAreaSize: {x: 12, y: 8}
