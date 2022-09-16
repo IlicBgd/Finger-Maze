@@ -44,3 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d85ba2b68ebe1064aa7b7d347c1c3da7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  north: {fileID: 0}
+  south: {fileID: 0}
+  west: {fileID: 0}
+  east: {fileID: 0}
+  cellID: 0
+  cellNumber: 0

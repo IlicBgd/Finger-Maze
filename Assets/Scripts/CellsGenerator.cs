@@ -34,8 +34,11 @@ public class CellsGenerator : MonoBehaviour
         {
             for (int y = 0; y < sizeVertical; y++)
             {
-                cells[x, y] = new Cell();
+                //cells[x, y] = new Cell();
+                cells[x, y] = Instantiate(cellPrefab, new Vector2(0, 0), Quaternion.identity, transform);
+                cells[x, y].name = string.Format("Cell number: {0}", cellCounter);
                 cells[x, y].cellID = cellCounter;
+                cells[x, y].cellNumber = cellCounter;
                 cellCounter++;
             }
         }
@@ -49,7 +52,8 @@ public class CellsGenerator : MonoBehaviour
     }
     private void Start()
     {
-        MazeAlgorithm();
+        //MazeAlgorithm();
+        StartCoroutine(RemoveEdgeCoroutine());
     }
     //Cell => only info
     //Use parent => scale, offset, position
@@ -100,7 +104,7 @@ public class CellsGenerator : MonoBehaviour
         {
             for (int j = 0; j < sizeVertical; j++)
             {
-                if (tempCells.FirstOrDefault(c => cells[i,j].cellID == c.cellID) == null)
+                if (tempCells.FirstOrDefault(c => cells[i, j].cellID == c.cellID) == null)
                 {
                     tempCells.Add(cells[i, j]);
                 }
@@ -112,53 +116,58 @@ public class CellsGenerator : MonoBehaviour
     {
         if (GetUniqueIDCount() > 1)
         {
-            MazeHelper(cells[Random.Range(0, sizeHorizontal), Random.Range(0, sizeVertical)]);
+            int randomX = Random.Range(0, sizeHorizontal);
+            int randomY = Random.Range(0, sizeVertical);
+            MazeHelper(cells[randomX, randomY], randomX, randomY);
+            Debug.Log(GetUniqueIDCount());
             MazeAlgorithm();
         }
     }
-    void MazeHelper(Cell cell)
+    void MazeHelper(Cell cell, int x, int y)
     {
-        //Add trees
         int randomSide = cell.GetRandomEdge();
-
-        if (randomSide == 0)
+        if (randomSide == 0 && cell.edgesExist == true)
         {
-            if (cell.cellID % sizeVertical != 0)
+            if (cell.cellNumber % sizeVertical != 0 && cell.cellID != cells[x, y - 1].cellID)
             {
                 Destroy(cell.north.gameObject);
+                TreeUnifier(cell.cellID, cells[x, y - 1].cellID);
             }
             else
             {
                 return;
             }
         }
-        else if (randomSide == 1)
+        else if (randomSide == 1 && cell.edgesExist == true)
         {
-            if ((cell.cellID + 1) % sizeVertical != 0)
+            if ((cell.cellNumber + 1) % sizeVertical != 0 && cell.cellID != cells[x, y + 1].cellID)
             {
                 Destroy(cell.south.gameObject);
+                TreeUnifier(cell.cellID, cells[x, y + 1].cellID);
             }
             else
             {
                 return;
             }
         }
-        else if (randomSide == 2)
+        else if (randomSide == 2 && cell.edgesExist == true)
         {
-            if (cell.cellID >= sizeVertical)
+            if (cell.cellNumber >= sizeVertical && cell.cellID != cells[x - 1, y].cellID)
             {
                 Destroy(cell.west.gameObject);
+                TreeUnifier(cell.cellID, cells[x - 1, y].cellID);
             }
             else
             {
                 return;
             }
         }
-        else if (randomSide == 3)
+        else if (randomSide == 3 && cell.edgesExist == true)
         {
-            if (cell.cellID < sizeHorizontal * sizeVertical - sizeVertical)
+            if (cell.cellNumber < sizeHorizontal * sizeVertical - sizeVertical && cell.cellID != cells[x + 1, y].cellID)
             {
                 Destroy(cell.east.gameObject);
+                TreeUnifier(cell.cellID, cells[x + 1, y].cellID);
             }
             else
             {
@@ -166,8 +175,29 @@ public class CellsGenerator : MonoBehaviour
             }
         }
     }
-    void TreeUnifier()
+    void TreeUnifier(int oldID, int newID)
     {
-
+        for (int i = 0; i < sizeHorizontal; i++)
+        {
+            for (int j = 0; j < sizeVertical; j++)
+            {
+                if (cells[i, j].cellID == oldID)
+                {
+                    cells[i, j].cellID = newID;
+                }
+            }
+        }
+    }
+    public IEnumerator RemoveEdgeCoroutine()
+    {
+        int loopNum = GetUniqueIDCount();
+        while (GetUniqueIDCount() > 1)
+        {
+            int randomX = Random.Range(0, sizeHorizontal);
+            int randomY = Random.Range(0, sizeVertical);
+            MazeHelper(cells[randomX, randomY], randomX, randomY);
+            Debug.Log(GetUniqueIDCount());
+            yield return new WaitForSeconds(.2f);
+        }
     }
 }
