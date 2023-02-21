@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/MainMenu.unity
+    guid: 9a5edba0b94ca644f8bd7c3c61b7afe3
+  - enabled: 1
+    path: Assets/Scenes/RectangleMaze.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/RingMaze.unity
+    guid: eb4de91a075fce24d90005a83a952ee2
   m_configObjects: {}
